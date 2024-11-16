@@ -61,12 +61,14 @@ def simulate_trade(trade_amount: float, leverage: bool = False) -> Dict[str, flo
 def trade_loop(simulate: bool = True):
     """Continuously execute or simulate trades until stopped by the user."""
     logging.info(f"Starting trade loop. Mode: {'Simulation' if simulate else 'Execution'}")
+    logging.info(f"Starting trade loop. Mode: {'Simulation' if simulate else 'Execution'}")
     balance = 1000  # Starting balance in USD
     open_orders = 0
     while True:
         market_data = fetch_market_data()
         if not market_data:
             print(Fore.BLUE + "Failed to fetch market data. Retrying...")
+            print(Fore.BLUE + "Retrying to fetch market data...")
             continue
         
         if risk_management(TRADE_AMOUNT, balance) and open_orders < 5:
@@ -80,13 +82,15 @@ def trade_loop(simulate: bool = True):
             print(Fore.BLUE + f"Trade executed. New balance: ${balance}")
         else:
             logging.warning("Trade exceeds risk management limits or max open orders reached.")
+            print(Fore.RED + "Trade skipped: Risk management limits exceeded or max open orders reached.")
         
-        print(Fore.BLUE + "Press Enter to stop or wait for the next trade...")
+        print(Fore.GREEN + "Press Enter to stop or wait for the next trade...")
         try:
             time.sleep(5)  # Wait for 5 seconds before the next trade
         except KeyboardInterrupt:
             break
     logging.info("Trade loop terminated.")
+    print(Fore.YELLOW + "Trade loop terminated.")
 
 if __name__ == "__main__":
     simulate_mode = input("Enter 's' to simulate trades or 'e' to execute trades: ").strip().lower() == 's'
