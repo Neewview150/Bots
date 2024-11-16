@@ -22,12 +22,26 @@ def risk_management(trade_amount: float, balance: float) -> bool:
     risk_threshold = 0.02  # Risk 2% of the balance
     return trade_amount <= balance * risk_threshold
 
+MAX_RETRIES = 5
+RETRY_DELAY = 2  # seconds
+
 def fetch_market_data() -> Dict[str, float]:
-    """Fetch mock data for USD/EUR simulation."""
-    # Mock data simulating 30 days of market data
-    mock_data = [{"day": i, "price": 1.10 + 0.01 * (i % 5)} for i in range(30)]
-    logging.info("Mock market data generated for simulation.")
-    return mock_data
+    """Fetch real-time prices and historical data for USD/EUR with retry mechanism."""
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = requests.get("https://api.fbs.com/market_data/usd_eur")
+            response.raise_for_status()
+            data = response.json()
+            logging.info("Market data fetched successfully.")
+            return data
+        except requests.RequestException as e:
+            logging.warning(f"Attempt {attempt + 1} failed: {e}")
+            if attempt < MAX_RETRIES - 1:
+                logging.info(f"Retrying in {RETRY_DELAY} seconds...")
+                time.sleep(RETRY_DELAY)
+            else:
+                logging.error("All retry attempts failed. Unable to fetch market data.")
+                return {}
 
 def calculate_trading_fees(trade_amount: float) -> float:
     """Calculate trading fees."""
