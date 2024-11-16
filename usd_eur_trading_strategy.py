@@ -60,6 +60,7 @@ def simulate_trade(trade_amount: float, leverage: bool = False) -> Dict[str, flo
 
 def trade_loop(simulate: bool = True):
     """Continuously execute or simulate trades until stopped by the user."""
+    logging.info(f"Starting trade loop. Mode: {'Simulation' if simulate else 'Execution'}")
     balance = 1000  # Starting balance in USD
     open_orders = 0
     while True:
@@ -85,6 +86,7 @@ def trade_loop(simulate: bool = True):
             time.sleep(5)  # Wait for 5 seconds before the next trade
         except KeyboardInterrupt:
             break
+    logging.info("Trade loop terminated.")
 
 if __name__ == "__main__":
     simulate_mode = input("Enter 's' to simulate trades or 'e' to execute trades: ").strip().lower() == 's'
