@@ -23,16 +23,11 @@ def risk_management(trade_amount: float, balance: float) -> bool:
     return trade_amount <= balance * risk_threshold
 
 def fetch_market_data() -> Dict[str, float]:
-    """Fetch real-time prices and historical data for USD/EUR."""
-    try:
-        response = requests.get("https://api.fbs.com/market_data/usd_eur")
-        response.raise_for_status()
-        data = response.json()
-        logging.info("Market data fetched successfully.")
-        return data
-    except requests.RequestException as e:
-        logging.error(f"Error fetching market data: {e}")
-        return {}
+    """Fetch mock data for USD/EUR simulation."""
+    # Mock data simulating 30 days of market data
+    mock_data = [{"day": i, "price": 1.10 + 0.01 * (i % 5)} for i in range(30)]
+    logging.info("Mock market data generated for simulation.")
+    return mock_data
 
 def calculate_trading_fees(trade_amount: float) -> float:
     """Calculate trading fees."""
@@ -64,10 +59,9 @@ def trade_loop(simulate: bool = True):
     logging.info(f"Starting trade loop. Mode: {'Simulation' if simulate else 'Execution'}")
     balance = 1000  # Starting balance in USD
     open_orders = 0
-    while True:
-        market_data = fetch_market_data()
-        if not market_data:
-            print(Fore.BLUE + "Failed to fetch market data. Retrying...")
+    market_data = fetch_market_data()
+    for day_data in market_data:
+        logging.info(f"Simulating day {day_data['day']} with price {day_data['price']}")
             print(Fore.BLUE + "Retrying to fetch market data...")
             continue
         
@@ -84,11 +78,10 @@ def trade_loop(simulate: bool = True):
             logging.warning("Trade exceeds risk management limits or max open orders reached.")
             print(Fore.RED + "Trade skipped: Risk management limits exceeded or max open orders reached.")
         
-        print(Fore.GREEN + "Press Enter to stop or wait for the next trade...")
-        try:
-            time.sleep(5)  # Wait for 5 seconds before the next trade
-        except KeyboardInterrupt:
-            break
+        logging.info(f"End of day {day_data['day']}. Current balance: ${balance}")
+        print(Fore.GREEN + f"End of day {day_data['day']}. Current balance: ${balance}")
+    logging.info("Simulation completed.")
+    print(Fore.YELLOW + "Simulation completed.")
     logging.info("Trade loop terminated.")
     print(Fore.YELLOW + "Trade loop terminated.")
 
