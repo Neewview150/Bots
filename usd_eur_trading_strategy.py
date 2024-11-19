@@ -23,9 +23,17 @@ def risk_management(trade_amount: float, balance: float) -> bool:
     return trade_amount <= balance * risk_threshold
 
 def fetch_market_data() -> Dict[str, float]:
-    """Fetch real-time prices and historical data for USD/EUR."""
+    """Fetch real-time prices and historical data for USD/EUR using OANDA API."""
     try:
-        response = requests.get("https://api.fbs.com/market_data/usd_eur")
+        url = "https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles"
+        headers = {
+            "Authorization": "Bearer YOUR_OANDA_API_TOKEN"
+        }
+        params = {
+            "count": 1,
+            "granularity": "M1"
+        }
+        response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
         data = response.json()
         logging.info("Market data fetched successfully.")
