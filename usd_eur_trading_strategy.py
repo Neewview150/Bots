@@ -24,14 +24,14 @@ def calculate_leverage(amount: float) -> float:
 def risk_management(trade_amount: float, balance: float) -> bool:
     """Ensure the trade does not exceed a certain percentage of the balance."""
     risk_threshold = 0.02  # Risk 2% of the balance
-    return trade_amount <= balance * risk_threshold
+    return trade_amount <= balance * risk_threshold and trade_amount <= MAX_LEVERAGE_TRADE
 
 def fetch_market_data() -> Dict[str, float]:
     """Fetch real-time prices and historical data for USD/EUR using OANDA API."""
     try:
         url = "https://api-fxpractice.oanda.com/v3/instruments/EUR_USD/candles"
         headers = {
-            "Authorization": "Bearer YOUR_OANDA_API_TOKEN"
+            "Authorization": "Bearer <YOUR_OANDA_API_TOKEN>"
         }
         params = {
             "count": 1,
@@ -43,7 +43,7 @@ def fetch_market_data() -> Dict[str, float]:
         logging.info("Market data fetched successfully.")
         return data
     except requests.RequestException as e:
-        logging.error(f"Error fetching market data: {e}")
+        logging.error(f"Error fetching market data: {e}", exc_info=True)
         return {}
 
 def calculate_trading_fees(trade_amount: float) -> float:
@@ -56,7 +56,7 @@ def execute_trade(trade_amount: float, leverage: bool = False) -> Dict[str, floa
     if leverage:
         trade_amount = calculate_leverage(trade_amount)
     # Simulate trade execution
-    logging.info(f"Executing trade: Amount = ${trade_amount}, Leverage = {leverage}")
+    logging.info(f"Executing trade: Amount = ${trade_amount}, Leverage = {leverage}, Balance before trade: ${balance}")
     # Here you would integrate with FBS API to execute the trade
     profit = trade_amount * 0.01  # Simulate a 1% profit
     fees = calculate_trading_fees(trade_amount)
@@ -67,7 +67,7 @@ def simulate_trade(trade_amount: float, leverage: bool = False) -> Dict[str, flo
     """Simulate a trade with or without leverage."""
     if leverage:
         trade_amount = calculate_leverage(trade_amount)
-    logging.info(f"Simulating trade: Amount = ${trade_amount}, Leverage = {leverage}")
+    logging.info(f"Simulating trade: Amount = ${trade_amount}, Leverage = {leverage}, Balance before simulation: ${balance}")
     return {"amount": trade_amount, "profit": trade_amount * 0.01}  # Simulate a 1% profit
 
 def trade_loop(simulate: bool = True):
